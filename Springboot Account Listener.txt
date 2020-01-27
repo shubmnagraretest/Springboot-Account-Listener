@@ -1,0 +1,47 @@
+
+public class AccountListener {
+
+  private static final Logger logger = LoggerFactory.getLogger(AccountListener.class);
+
+
+  @Autowired
+  private JavaMailSender javaMailSender;
+
+
+  @PrePersist
+  @PreUpdate
+  public void methodExecuteBeforeSave(final Account account) {
+    // make any change to the entity such as calculation before the save process
+    logger.trace("Entering  methodExecuteBeforeSave");
+
+    final String header = "<h1\r\n" + "  class=\"text-normal\"\r\n"
+        + "  style=\"color: #586069; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 20px; font-weight: 400 !important; line-height: 1.25; margin: 0 0 30px; padding: 0; text-align: left; word-break: normal\"\r\n"
+        + "  align=\"left\"\r\n" + ">\r\n"
+        + ConfigUtility.getProperty(Constants.CONFIG_REGISTRATIONMESSAGE)
+        + " <br/> <strong class=\"text-gray-dark\" style=\"color: #24292e !important\"\r\n"
+        + "    >" + account.getEmail() + "</strong\r\n" + "  >.\r\n" + "</h1>\r\n" + "<br />\r\n"
+        + "<br />\r\n" + "";
+    final String button =
+        "<a style=\"background: #0366d6; border-radius: 5px; border: 1px solid #0366d6; box-sizing: border-box; color: #ffffff; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; margin: 0; padding: 10px 20px; text-decoration: none\" href=\""
+            + ConfigUtility.getProperty(Constants.CONFIG_REGISTRATIONURL) + account.getUuid()
+            + "\" target=\"CWP13uYdIjVdw61W26oFZ0Z\">Verify email address</a>";
+
+    final String bottom = "<p\r\n" + "  class=\"f6 text-gray\"\r\n"
+        + "  style=\"color: #586069 !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; font-size: 12px !important; font-weight: normal; line-height: 1.5; margin: 0 0 15px; padding: 0; text-align: left\"\r\n"
+        + "  align=\"left\"\r\n" + ">\r\n"
+        + "  Button not working? Paste the following link into your browser:\r\n" + "  <a\r\n"
+        + "    style=\"box-sizing: border-box; color: #0366d6; text-decoration: none; word-break: break-all\"\r\n"
+        + "    href=\"" + ConfigUtility.getProperty(Constants.CONFIG_REGISTRATIONURL)
+        + account.getUuid() + "\"" + "    target=\"SuODIy05c0GplMaIrjMdNgI\"\r\n" + "    >"
+        + ConfigUtility.getProperty(Constants.CONFIG_REGISTRATIONURL) + account.getUuid()
+        + "</a\r\n" + "  >\r\n" + "</p>\r\n" + "";
+
+    if (!!!account.isEmailVerified()) {
+      Utils.sendMail(javaMailSender, account.getEmail(),
+          ConfigUtility.getProperty(Constants.CONFIG_REGISTRATIONTITLE), header + button + bottom);
+    }
+
+    logger.trace("Exting  methodExecuteBeforeSave...\n");
+
+  }
+}
